@@ -4,7 +4,7 @@ title: Initialization
 
 To understand the initialization process, some background on the underlying libraries are required. For the [Schnorrkel sr25519](https://github.com/w3f/schnorrkel) a WASM library is used. This means that before `sr25519` can be used, the WASM libraries needs to be loaded and initialized. This is not an issue when the keyring only uses `ed25519`.
 
-If you have been through the [base keyring documentation](../../keyring/start), you should be familiar with this process.
+If you have been through the [base keyring documentation](../../keyring/start/intro.md), you should be familiar with this process.
 
 
 ## Create
@@ -82,7 +82,7 @@ In addition to the `ss58Format` and `type` options (both optional), the followin
 
 - `isDevelopment?: boolean` - This flag, when set to `true` loads the keyring in development mode. This means that the default development accounts such as "Alice", "Bob", ..., "Ferdie" are included in the keyring. Generally you would only specify this when  actually connected to a development chain.
 
-- `store?: KeyringStore` - An optional store to be used. By default the `ui-keyring` will user browser localStorage, but with a specific store this behavior can be adjusted. For instance, for an extension we would default to the extension store (although localStorage is available) and for Electron apps, we may want to default to file storage.
+- `store?: KeyringStore` - An optional store to be used. By default the `ui-keyring` will use browser localStorage, but with a specific store this behavior can be adjusted. For instance, for an extension we would default to the extension store (although localStorage is available) and for Electron apps, we may want to default to file storage.
 
 ```js
 // For file storage where available, e.g. in Electron environments.

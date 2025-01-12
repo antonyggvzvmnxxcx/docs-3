@@ -14,46 +14,20 @@ Quite often it is useful (taking pruning into account, more on this later) to re
 // Retrieve the current block header
 const lastHdr = await api.rpc.chain.getHeader();
 
-// Retrieve the balance at both the current and the parent hashes
-const [{ data: balanceNow }, { data: balancePrev }] = await Promise.all([
-  api.query.system.account.at(lastHdr.hash, ADDR),
-  api.query.system.account.at(lastHdr.parentHash, ADDR)
-]);
+// Get a decorated api instance at a specific block
+const apiAt = await api.at(lastHdr.hash);
 
-// Display the difference
-console.log(`The delta was ${balanceNow.free.sub(balancePrev.free)}`);
-```
+// query the balance at this point of the chain
+const { data: { free } } = await apiAt.query.system.account(ADDR);
 
-In the above example, we introduce the `.at(<hash>[, ...params]): Type` query. For all `.at` queries, the first parameter is always the block hash at which we want to make the query, in our example we use both the last retrieved block and the parent thereof. The params are optional as per the type of query made, for instance to retrieve the timestamp for a previous block, it would be -
-
-```js
-...
-
-// Retrieve the timestamp for the previous block
-const momentPrev = await api.query.timestamp.now.at(lastHdr.parentHash);
+// Display the free balance
+console.log(`The current free is ${free.toString()}`);
 ```
 
 The `.at` queries are all single-shot, i.e. there are no subscription option to these, since the state for a previous block should be static. (This is true to a certain extent, i.e. when blocks have been finalized).
 
 An additional point to take care of (briefly mentioned above), is state pruning. By default a Polkadot/Substrate node will only keep state for the last 256 blocks, unless it is explicitly run in archive mode. This means that querying state further back than the pruning period will result in an error returned from the Node. (Generally most public RPC nodes only run with default settings, which includes aggressive state pruning)
 
-## State for a range of blocks
-
-In addition to the `.at` queries, you can also query state starting at a specific historic block and up to either a specified or the latest blocks. This is done via the `.range([from, to?], <...opt params>): [Hash, Type][]` query. As an example -
-
-```js
-...
-// Retrieve the current block header
-const lastHdr = await api.rpc.chain.getHeader();
-const startHdr = await api.rpc.chain.getBlockHash(lastHdr.number.unwrap().subn(500));
-
-// retrieve the range of changes
-const changes = await api.query.system.account.range([startHdr],ADDR);
-
-changes.forEach(([hash, value]) => {
-  console.log(hash.toHex(), value.toHuman());
-});
-```
 
 ## Map keys & entries
 
@@ -65,7 +39,7 @@ When working maps and double-maps, it is possible to retrieve a list of all the 
 const activeEra = await api.query.staking.activeEra();
 
 // retrieve all exposures for the active era
-const exposures = await api.query.staking.erasStakers.entries(activeEra.index);
+const exposures = await api.query.staking.erasStakers.entries(activeEra.unwrap().index);
 
 exposures.forEach(([key, exposure]) => {
   console.log('key arguments:', key.args.map((k) => k.toHuman()));
@@ -80,7 +54,7 @@ To understand the usage of the `key.args`, you need to understand that map/doubl
 
 the same applies to `.keys()` - here the list of keys also have the decoded args, as specified. You can think of `.args` as a tuple with the same types as the types required to retrieve a single entry in the map.
 
-In the first example we are querying a double-map, so we supply 1 argument. No arguments on double-maps will be very costly, retrieving all the eras and associated entries. In the same way as above we can simply do `.keys(activeEra.index): StorageKey[]` to retrieve all the keys here, including the individual keys args (available on maps with decodable hashing functions) -
+In the first example we are querying a double-map, so we supply 1 argument. No arguments on double-maps will be very costly, retrieving all the eras and associated entries. In the same way as above we can simply do `.keys(activeEra.unwrap().index): StorageKey[]` to retrieve all the keys here, including the individual keys args (available on maps with decodable hashing functions) -
 
 ```js
 // retrieve all the nominator keys

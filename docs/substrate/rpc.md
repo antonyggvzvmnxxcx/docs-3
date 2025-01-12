@@ -2,7 +2,7 @@
 title: JSON-RPC
 ---
 
-The following sections contain RPC methods that are Remote Calls available by default and allow you to interact with the actual node, query, and submit.
+The following sections contain known RPC methods that may be available on specific nodes (depending on configuration and available pallets) and allow you to interact with the actual node, query, and submit.
 
 - **[author](#author)**
 
@@ -15,6 +15,8 @@ The following sections contain RPC methods that are Remote Calls available by de
 - **[childstate](#childstate)**
 
 - **[contracts](#contracts)**
+
+- **[dev](#dev)**
 
 - **[engine](#engine)**
 
@@ -50,16 +52,19 @@ ___
 - **interface**: `api.rpc.author.hasKey`
 - **jsonrpc**: `author_hasKey`
 - **summary**: Returns true if the keystore has private keys for the given public key and key type.
+- **unsafe**: This method is only active with appropriate flags
  
 ### hasSessionKeys(sessionKeys: `Bytes`): `bool`
 - **interface**: `api.rpc.author.hasSessionKeys`
 - **jsonrpc**: `author_hasSessionKeys`
 - **summary**: Returns true if the keystore has private keys for the given session public keys.
+- **unsafe**: This method is only active with appropriate flags
  
 ### insertKey(keyType: `Text`, suri: `Text`, publicKey: `Bytes`): `Bytes`
 - **interface**: `api.rpc.author.insertKey`
 - **jsonrpc**: `author_insertKey`
 - **summary**: Insert a key into the keystore.
+- **unsafe**: This method is only active with appropriate flags
  
 ### pendingExtrinsics(): `Vec<Extrinsic>`
 - **interface**: `api.rpc.author.pendingExtrinsics`
@@ -70,11 +75,13 @@ ___
 - **interface**: `api.rpc.author.removeExtrinsic`
 - **jsonrpc**: `author_removeExtrinsic`
 - **summary**: Remove given extrinsic from the pool and temporarily ban it to prevent reimporting
+- **unsafe**: This method is only active with appropriate flags
  
 ### rotateKeys(): `Bytes`
 - **interface**: `api.rpc.author.rotateKeys`
 - **jsonrpc**: `author_rotateKeys`
 - **summary**: Generate new session keys and returns the corresponding public keys
+- **unsafe**: This method is only active with appropriate flags
  
 ### submitAndWatchExtrinsic(extrinsic: `Extrinsic`): `ExtrinsicStatus`
 - **interface**: `api.rpc.author.submitAndWatchExtrinsic`
@@ -95,16 +102,22 @@ ___
 - **interface**: `api.rpc.babe.epochAuthorship`
 - **jsonrpc**: `babe_epochAuthorship`
 - **summary**: Returns data about which slots (primary or secondary) can be claimed in the current epoch with the keys in the keystore
+- **unsafe**: This method is only active with appropriate flags
 
 ___
 
 
 ## beefy
  
-### subscribeJustifications(): `BeefySignedCommitment`
+### getFinalizedHead(): `H256`
+- **interface**: `api.rpc.beefy.getFinalizedHead`
+- **jsonrpc**: `beefy_getFinalizedHead`
+- **summary**: Returns hash of the latest BEEFY finalized block as seen by this client.
+ 
+### subscribeJustifications(): `BeefyVersionedFinalityProof`
 - **interface**: `api.rpc.beefy.subscribeJustifications`
 - **jsonrpc**: `beefy_subscribeJustifications`
-- **summary**: Returns the block most recently finalized by BEEFY, alongside side its justification.
+- **summary**: Returns the block most recently finalized by BEEFY, alongside its justification.
 
 ___
 
@@ -190,21 +203,42 @@ ___
 - **interface**: `api.rpc.contracts.call`
 - **jsonrpc**: `contracts_call`
 - **summary**: Executes a call to a contract
+- **deprecated**: Use the runtime interface `api.call.contractsApi.call` instead
  
 ### getStorage(address: `AccountId`, key: `H256`, at?: `BlockHash`): `Option<Bytes>`
 - **interface**: `api.rpc.contracts.getStorage`
 - **jsonrpc**: `contracts_getStorage`
 - **summary**: Returns the value under a specified storage key in a contract
+- **deprecated**: Use the runtime interface `api.call.contractsApi.getStorage` instead
  
-### instantiate(request: `InstantiateRequest`, at?: `BlockHash`): `ContractInstantiateResult`
+### instantiate(request: `InstantiateRequestV1`, at?: `BlockHash`): `ContractInstantiateResult`
 - **interface**: `api.rpc.contracts.instantiate`
 - **jsonrpc**: `contracts_instantiate`
 - **summary**: Instantiate a new contract
+- **deprecated**: Use the runtime interface `api.call.contractsApi.instantiate` instead
  
 ### rentProjection(address: `AccountId`, at?: `BlockHash`): `Option<BlockNumber>`
 - **interface**: `api.rpc.contracts.rentProjection`
 - **jsonrpc**: `contracts_rentProjection`
 - **summary**: Returns the projected time a given contract will be able to sustain paying its rent
+- **deprecated**: Not available in newer versions of the contracts interfaces
+ 
+### uploadCode(uploadRequest: `CodeUploadRequest`, at?: `BlockHash`): `CodeUploadResult`
+- **interface**: `api.rpc.contracts.uploadCode`
+- **jsonrpc**: `contracts_upload_code`
+- **summary**: Upload new code without instantiating a contract from it
+- **deprecated**: Use the runtime interface `api.call.contractsApi.uploadCode` instead
+
+___
+
+
+## dev
+ 
+### getBlockStats(at: `Hash`): `Option<BlockStats>`
+- **interface**: `api.rpc.dev.getBlockStats`
+- **jsonrpc**: `dev_getBlockStats`
+- **summary**: Reexecute the specified `block_hash` and gather statistics while doing so
+- **unsafe**: This method is only active with appropriate flags
 
 ___
 
@@ -255,6 +289,11 @@ ___
 - **interface**: `api.rpc.eth.estimateGas`
 - **jsonrpc**: `eth_estimateGas`
 - **summary**: Estimate gas needed for execution of given contract.
+ 
+### feeHistory(blockCount: `U256`, newestBlock: `BlockNumber`, rewardPercentiles: `Option<Vec<f64>>`): `EthFeeHistory`
+- **interface**: `api.rpc.eth.feeHistory`
+- **jsonrpc**: `eth_feeHistory`
+- **summary**: Returns fee history for given block count & reward percentiles
  
 ### gasPrice(): `U256`
 - **interface**: `api.rpc.eth.gasPrice`
@@ -331,7 +370,7 @@ ___
 - **jsonrpc**: `eth_getTransactionByHash`
 - **summary**: Get transaction by its hash.
  
-### getTransactionCount(hash: `H256`, number?: `BlockNumber`): `U256`
+### getTransactionCount(address: `H160`, number?: `BlockNumber`): `U256`
 - **interface**: `api.rpc.eth.getTransactionCount`
 - **jsonrpc**: `eth_getTransactionCount`
 - **summary**: Returns the number of transactions sent from given address at given time (block number).
@@ -370,6 +409,11 @@ ___
 - **interface**: `api.rpc.eth.hashrate`
 - **jsonrpc**: `eth_hashrate`
 - **summary**: Returns the number of hashes per second that the node is mining with.
+ 
+### maxPriorityFeePerGas(): `U256`
+- **interface**: `api.rpc.eth.maxPriorityFeePerGas`
+- **jsonrpc**: `eth_maxPriorityFeePerGas`
+- **summary**: Returns max priority fee per gas
  
 ### mining(): `bool`
 - **interface**: `api.rpc.eth.mining`
@@ -441,12 +485,12 @@ ___
 - **jsonrpc**: `net_listening`
 - **summary**: Returns true if client is actively listening for network connections. Otherwise false.
  
-### peerCount(): `String`
+### peerCount(): `Text`
 - **interface**: `api.rpc.net.peerCount`
 - **jsonrpc**: `net_peerCount`
 - **summary**: Returns number of peers connected to node.
  
-### version(): `String`
+### version(): `Text`
 - **interface**: `api.rpc.net.version`
 - **jsonrpc**: `net_version`
 - **summary**: Returns protocol version.
@@ -456,7 +500,7 @@ ___
 
 ## eth/web3
  
-### clientVersion(): `String`
+### clientVersion(): `Text`
 - **interface**: `api.rpc.web3.clientVersion`
 - **jsonrpc**: `web3_clientVersion`
 - **summary**: Returns current client version.
@@ -471,10 +515,10 @@ ___
 
 ## grandpa
  
-### proveFinality(begin: `BlockHash`, end: `BlockHash`, authoritiesSetId?: `u64`): `Option<EncodedFinalityProofs>`
+### proveFinality(blockNumber: `BlockNumber`): `Option<EncodedFinalityProofs>`
 - **interface**: `api.rpc.grandpa.proveFinality`
 - **jsonrpc**: `grandpa_proveFinality`
-- **summary**: Prove finality for the range (begin; end] hash.
+- **summary**: Prove finality for the given block number, returning the Justification for the last block in the set.
  
 ### roundState(): `ReportedRoundStates`
 - **interface**: `api.rpc.grandpa.roundState`
@@ -491,10 +535,25 @@ ___
 
 ## mmr
  
-### generateProof(leafIndex: `u64`, at?: `BlockHash`): `MmrLeafProof`
+### generateProof(blockNumbers: `Vec<u64>`, bestKnownBlockNumber?: `u64`, at?: `BlockHash`): `MmrLeafBatchProof`
 - **interface**: `api.rpc.mmr.generateProof`
 - **jsonrpc**: `mmr_generateProof`
-- **summary**: Generate MMR proof for given leaf index.
+- **summary**: Generate MMR proof for the given block numbers.
+ 
+### root(at?: `BlockHash`): `MmrHash`
+- **interface**: `api.rpc.mmr.root`
+- **jsonrpc**: `mmr_root`
+- **summary**: Get the MMR root hash for the current best block.
+ 
+### verifyProof(proof: `MmrLeafBatchProof`): `bool`
+- **interface**: `api.rpc.mmr.verifyProof`
+- **jsonrpc**: `mmr_verifyProof`
+- **summary**: Verify an MMR proof
+ 
+### verifyProofStateless(root: `MmrHash`, proof: `MmrLeafBatchProof`): `bool`
+- **interface**: `api.rpc.mmr.verifyProofStateless`
+- **jsonrpc**: `mmr_verifyProofStateless`
+- **summary**: Verify an MMR proof statelessly given an mmr_root
 
 ___
 
@@ -505,11 +564,13 @@ ___
 - **interface**: `api.rpc.offchain.localStorageGet`
 - **jsonrpc**: `offchain_localStorageGet`
 - **summary**: Get offchain local storage under given key and prefix
+- **unsafe**: This method is only active with appropriate flags
  
 ### localStorageSet(kind: `StorageKind`, key: `Bytes`, value: `Bytes`): `Null`
 - **interface**: `api.rpc.offchain.localStorageSet`
 - **jsonrpc**: `offchain_localStorageSet`
 - **summary**: Set offchain local storage under given key and prefix
+- **unsafe**: This method is only active with appropriate flags
 
 ___
 
@@ -520,11 +581,13 @@ ___
 - **interface**: `api.rpc.payment.queryFeeDetails`
 - **jsonrpc**: `payment_queryFeeDetails`
 - **summary**: Query the detailed fee of a given encoded extrinsic
+- **deprecated**: Use `api.call.transactionPaymentApi.queryFeeDetails` instead
  
-### queryInfo(extrinsic: `Bytes`, at?: `BlockHash`): `RuntimeDispatchInfo`
+### queryInfo(extrinsic: `Bytes`, at?: `BlockHash`): `RuntimeDispatchInfoV1`
 - **interface**: `api.rpc.payment.queryInfo`
 - **jsonrpc**: `payment_queryInfo`
 - **summary**: Retrieves the fee information for an encoded extrinsic
+- **deprecated**: Use `api.call.transactionPaymentApi.queryInfo` instead
 
 ___
 
@@ -575,6 +638,7 @@ ___
 - **interface**: `api.rpc.state.getKeys`
 - **jsonrpc**: `state_getKeys`
 - **summary**: Retrieves the keys with a certain prefix
+- **deprecated**: Use `api.rpc.state.getKeysPaged` to retrieve keys
  
 ### getKeysPaged(key: `StorageKey`, count: `u32`, startKey?: `StorageKey`, at?: `BlockHash`): `Vec<StorageKey>`
 - **interface**: `api.rpc.state.getKeysPaged`
@@ -590,6 +654,8 @@ ___
 - **interface**: `api.rpc.state.getPairs`
 - **jsonrpc**: `state_getPairs`
 - **summary**: Returns the keys with prefix, leave empty to get all the keys (deprecated: Use getKeysPaged)
+- **deprecated**: Use `api.rpc.state.getKeysPaged` to retrieve keys
+- **unsafe**: This method is only active with appropriate flags
  
 ### getReadProof(keys: `Vec<StorageKey>`, at?: `BlockHash`): `ReadProof`
 - **interface**: `api.rpc.state.getReadProof`
@@ -620,6 +686,7 @@ ___
 - **interface**: `api.rpc.state.queryStorage`
 - **jsonrpc**: `state_queryStorage`
 - **summary**: Query historical storage entries (by key) starting from a start block
+- **unsafe**: This method is only active with appropriate flags
  
 ### queryStorageAt(keys: `Vec<StorageKey>`, at?: `BlockHash`): `Vec<StorageChangeSet>`
 - **interface**: `api.rpc.state.queryStorageAt`
@@ -640,6 +707,13 @@ ___
 - **interface**: `api.rpc.state.traceBlock`
 - **jsonrpc**: `state_traceBlock`
 - **summary**: Provides a way to trace the re-execution of a single block
+- **unsafe**: This method is only active with appropriate flags
+ 
+### trieMigrationStatus(at?: `BlockHash`): `MigrationStatusResult`
+- **interface**: `api.rpc.state.trieMigrationStatus`
+- **jsonrpc**: `state_trieMigrationStatus`
+- **summary**: Check current migration state
+- **unsafe**: This method is only active with appropriate flags
 
 ___
 
@@ -665,11 +739,13 @@ ___
 - **interface**: `api.rpc.system.addLogFilter`
 - **jsonrpc**: `system_addLogFilter`
 - **summary**: Adds the supplied directives to the current log filter
+- **unsafe**: This method is only active with appropriate flags
  
 ### addReservedPeer(peer: `Text`): `Text`
 - **interface**: `api.rpc.system.addReservedPeer`
 - **jsonrpc**: `system_addReservedPeer`
 - **summary**: Adds a reserved peer
+- **unsafe**: This method is only active with appropriate flags
  
 ### chain(): `Text`
 - **interface**: `api.rpc.system.chain`
@@ -685,6 +761,7 @@ ___
 - **interface**: `api.rpc.system.dryRun`
 - **jsonrpc**: `system_dryRun`
 - **summary**: Dry run an extrinsic at a given block
+- **unsafe**: This method is only active with appropriate flags
  
 ### health(): `Health`
 - **interface**: `api.rpc.system.health`
@@ -710,6 +787,7 @@ ___
 - **interface**: `api.rpc.system.networkState`
 - **jsonrpc**: `system_networkState`
 - **summary**: Returns current state of the network
+- **unsafe**: This method is only active with appropriate flags
  
 ### nodeRoles(): `Vec<NodeRole>`
 - **interface**: `api.rpc.system.nodeRoles`
@@ -720,6 +798,7 @@ ___
 - **interface**: `api.rpc.system.peers`
 - **jsonrpc**: `system_peers`
 - **summary**: Returns the currently connected peers
+- **unsafe**: This method is only active with appropriate flags
  
 ### properties(): `ChainProperties`
 - **interface**: `api.rpc.system.properties`
@@ -730,6 +809,7 @@ ___
 - **interface**: `api.rpc.system.removeReservedPeer`
 - **jsonrpc**: `system_removeReservedPeer`
 - **summary**: Remove a reserved peer
+- **unsafe**: This method is only active with appropriate flags
  
 ### reservedPeers(): `Vec<Text>`
 - **interface**: `api.rpc.system.reservedPeers`
@@ -740,6 +820,7 @@ ___
 - **interface**: `api.rpc.system.resetLogFilter`
 - **jsonrpc**: `system_resetLogFilter`
 - **summary**: Resets the log filter to Substrate defaults
+- **unsafe**: This method is only active with appropriate flags
  
 ### syncState(): `SyncState`
 - **interface**: `api.rpc.system.syncState`

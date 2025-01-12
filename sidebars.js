@@ -50,14 +50,39 @@ module.exports = {
       },
       'api/FAQ'
     ],
-    'Substrate Metadata': [
-      'substrate/intro',
-      'substrate/rpc',
-      'substrate/constants',
-      'substrate/storage',
-      'substrate/extrinsics',
-      'substrate/events',
-      'substrate/errors'
+    Metadata: [
+      {
+        Substrate: [
+          'substrate/intro',
+          'substrate/runtime',
+          'substrate/rpc',
+          'substrate/constants',
+          'substrate/storage',
+          'substrate/extrinsics',
+          'substrate/events',
+          'substrate/errors'
+        ],
+        Polkadot: [
+          'polkadot/intro',
+          'polkadot/runtime',
+          'polkadot/rpc',
+          'polkadot/constants',
+          'polkadot/storage',
+          'polkadot/extrinsics',
+          'polkadot/events',
+          'polkadot/errors'
+        ],
+        Kusama: [
+          'kusama/intro',
+          'kusama/runtime',
+          'kusama/rpc',
+          'kusama/constants',
+          'kusama/storage',
+          'kusama/extrinsics',
+          'kusama/events',
+          'kusama/errors'
+        ]
+      }
     ],
     Keyring: [
       'keyring/intro',
@@ -101,6 +126,7 @@ module.exports = {
           'api-contract/start/intro',
           'api-contract/start/install',
           'api-contract/start/basics',
+          'api-contract/start/prerequisites',
           'api-contract/start/code',
           'api-contract/start/blueprint',
           'api-contract/start/contract.read',
@@ -133,6 +159,9 @@ module.exports = {
       'extension/usage',
       'extension/cookbook',
       'extension/FAQ'
+    ],
+    'Run, Bundle, Test': [
+      'usage/FAQ'
     ],
   },
 };

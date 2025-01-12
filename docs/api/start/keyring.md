@@ -2,7 +2,7 @@
 title: Keyring
 ---
 
-This section will give a quick introduction into the Keyring, including the addition of accounts, retrieving pairs and the signing of any data. Unlike the rest of the API, only the core concepts will be covered with the most-used-functions. However, what is covered is enough for 99.9 of the use-cases ... or rather, that is the aim.
+This section will give a quick introduction into the Keyring, including the addition of accounts, retrieving pairs and the signing of any data. Unlike the rest of the API, only the core concepts will be covered with the most-used-functions. However, what is covered is enough for 99.9% of the use-cases ... or rather, that is the aim.
 
 
 ## Installation
@@ -54,7 +54,7 @@ const newDeri = keyring.addFromUri(`${PHRASE}//hard-derived/soft-derived`);
 const alice = keyring.addFromUri('//Alice', { name: 'Alice default' });
 ```
 
-The above additions cater for most of the use cases and aligns with the you would find in the Substrate `subkey`. Be very wary of the last "dev-seed" option, it is explicitly added for `subkey` compatibility and implies using the "known-everywhere" dev seed. It is however useful when running Polkadot/Substrate with a `--dev` flag.
+The above additions cater for most of the use cases and aligns with what you would find in the Substrate `subkey`. Be very wary of the last "dev-seed" option, it is explicitly added for `subkey` compatibility and implies using the "known-everywhere" dev seed. It is however useful when running Polkadot/Substrate with a `--dev` flag.
 
 
 ## Adding accounts with raw seeds
@@ -100,7 +100,7 @@ import { stringToU8a, u8aToHex } from '@polkadot/util';
 // Convert message, sign and then verify
 const message = stringToU8a('this is our message');
 const signature = alice.sign(message);
-const isValid = alice.verify(message, signature);
+const isValid = alice.verify(message, signature, alice.publicKey);
 
 // Log info
 console.log(`The signature ${u8aToHex(signature)}, is ${isValid ? '' : 'in'}valid`);
